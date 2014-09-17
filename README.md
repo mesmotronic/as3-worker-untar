@@ -2,10 +2,12 @@ Untar Worker for Adobe AIR
 ==========================
 
 Untar Worker for Adobe AIR is an ActionScript 3 Worker class used to extract 
-uncompressed gnu-tar files, created with tar -cf, in the background.
+uncompressed gnu-tar files, created using `tar -cf`, in the background.
 
 The Worker is designed to be used a one shot thing, and will self-terminate
 on completion.
+
+Released under BSD license. Requires AIR 3.4+.
 
 Example Project
 ---------------
