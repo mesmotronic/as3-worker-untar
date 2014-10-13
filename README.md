@@ -27,7 +27,7 @@ protected function untar(sourcePath:String, targetPath:String):void
 {
 	// giveAppPrivileges parameter MUST be set to true!
 	untarWorker = WorkerDomain.current.createWorker(new untarWorkerClass(), true);
-	untarWorker.addEventListener(Event.WORKER_STATE, untarWorker_workerStateHandler);
+	untarWorker.addEventListener(Event.WORKER_STATE, untarWorker_workerState);
 	
 	resultChannel = untarWorker.createMessageChannel(Worker.current);
 	resultChannel.addEventListener(Event.CHANNEL_MESSAGE, resultChannel_channelMessage);
@@ -39,7 +39,7 @@ protected function untar(sourcePath:String, targetPath:String):void
 	untarWorker.start();
 }
 
-protected function untarWorker_workerStateHandler(event:Event):void
+protected function untarWorker_workerState(event:Event):void
 {
 	trace("untarWorker.state =", untarWorker.state);
 }
