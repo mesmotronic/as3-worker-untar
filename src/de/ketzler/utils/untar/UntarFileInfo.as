@@ -22,30 +22,26 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package de.ketzler.utils.untar {
-
-	public class UntarFileInfo extends Object {
-		
-		
+package de.ketzler.utils.untar 
+{
+	public class UntarFileInfo extends Object 
+	{
 		public var _filename:String;
 		public var startPosition:uint;
 		public var size:uint;
-		
-		
-		public function UntarFileInfo() {
-		}
-		
 		
 		public function toString():String
 		{
 			return 'UntarFileInfo: filename: ' + filename + ' , startPosition: ' + startPosition + '  size: ' + size;
 		}
 
-		public function get filename() : String {
+		public function get filename() : String 
+		{
 			return _filename;
 		}
 
-		public function set filename(filename : String) : void {
+		public function set filename(filename : String) : void 
+		{
 			var rx:RegExp = /\\/g;
 			
 			// Windows separators umdrehen

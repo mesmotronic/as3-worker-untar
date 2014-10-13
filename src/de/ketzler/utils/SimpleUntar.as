@@ -24,83 +24,75 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
-*/
+ */
 
-package de.ketzler.utils
+package de.ketzler.utils 
 {
-	import flash.utils.ByteArray;
-	import flash.utils.getDefinitionByName;
-	
 	import de.ketzler.utils.untar.UntarFileInfo;
 	import de.ketzler.utils.untar.UntarHeaderBlock;
-	
+
+	import flash.filesystem.File;
+	import flash.filesystem.FileMode;
+	import flash.filesystem.FileStream;
+	import flash.utils.ByteArray;
+
 	public class SimpleUntar
 	{
 		public static var BLOCK_SIZE:uint = 512;
 		public static var BLOCK_SIZE_FACTOR:Number = 1 / 512;
-		public static var SAVEDBYTES_AT_ONCE:uint = 4 * 1024 * 1024; // 4 MB
-		
+		public static var SAVEDBYTES_AT_ONCE:uint = 4*1024*1024; // 4 MB
 		public static const CODE_PAGE:String = "iso-8859-1";
 		
 		private var _sourcePath:String;
 		private var _targetPath:String;
-		private var sourceFile:*;
-		private var targetFile:*;
-		private var sourceFileStream:*;
+		private var sourceFile:File;
+		private var targetFile:File;
+		private var sourceFileStream:FileStream;
 		
 		private var allFiles:Vector.<UntarFileInfo> = new Vector.<UntarFileInfo>();
 		private var allDirectories:Vector.<UntarFileInfo> = new Vector.<UntarFileInfo>();
 		private var tempFileInfo:UntarFileInfo;
-		private var tempFile:*;
-		private var tempFileStream:*;
-		private var availBytes:uint;
-		private var walkerPosition:uint;
+		private var tempFile:File;
+		private var tempFileStream:FileStream;
 		private var tempBA:ByteArray = new ByteArray();
-		
-		private var FileClass:Class;
-		private var FileModeClass:Class;
-		private var FileStreamClass:Class;
+
+		// Switched to Number to support files larger than 2^32 bytes
+		private var availBytes:Number;
+		private var walkerPosition:Number;
 		
 		public function SimpleUntar()
 		{
-			FileClass = getDefinitionByName("flash.filesystem.File") as Class;
-			FileModeClass = getDefinitionByName("flash.filesystem.FileMode") as Class;
-			FileStreamClass = getDefinitionByName("flash.filesystem.FileStream") as Class;
-			
-			if (!FileClass || !FileModeClass || !FileStreamClass)
-			{
-				throw new Error("SimpleUntar requires Adobe AIR");
-			}
+			super();
 		}
-		
-		public function get sourcePath():String
+
+		public function get sourcePath():String 
 		{
 			return _sourcePath;
 		}
-		
-		public function set sourcePath(sourcePath:String):void
+
+		public function set sourcePath(sourcePath:String):void 
 		{
 			_sourcePath = sourcePath;
 			
-			sourceFile = new FileClass(sourcePath);
+			sourceFile = new File(sourcePath);
 			
-			if (sourceFile.exists)
+			if(sourceFile.exists)
 			{
-				sourceFileStream = new FileStreamClass();
-				sourceFileStream.open(sourceFile, FileModeClass.READ);
-				
+				sourceFileStream = new FileStream();
+				sourceFileStream.open(sourceFile, FileMode.READ);
+			
 				getAllFilenames();
 			}
 		}
 		
-		public function get targetPath():String
+		public function get targetPath():String 
 		{
 			return _targetPath;
 		}
-		
-		public function set targetPath(targetPath:String):void
+
+		public function set targetPath(targetPath:String):void 
 		{
-			targetFile = new FileClass(targetPath);
+			targetFile = new File(targetPath);
 			
 			if (!targetFile.exists)
 			{
@@ -118,34 +110,12 @@ package de.ketzler.utils
 		
 		public function close():void
 		{
-			if (sourceFileStream)
-			{
-				sourceFileStream.close();
-			}
-		}
-		
-		public function getFileContent(filename:String):ByteArray
-		{
-			tempBA.clear();
-			
-			for (var i:int = 0; i < allFiles.length; i++)
-			{
-				tempFileInfo = allFiles[i];
-				
-				if (tempFileInfo.filename == filename)
-				{
-					sourceFileStream.position = tempFileInfo.startPosition;
-					sourceFileStream.readBytes(tempBA, 0, tempFileInfo.size);
-					break;
-				}
-			}
-			
-			return tempBA;
+			sourceFileStream.close();
 		}
 		
 		private function createDirs():void
 		{
-			for (var i:int = 0; i < allDirectories.length; i++)
+			for (var i:int = 0; i < allDirectories.length; i++) 
 			{
 				tempFile = targetFile.resolvePath(allDirectories[i].filename);
 				
@@ -158,19 +128,18 @@ package de.ketzler.utils
 		
 		private function createFiles():void
 		{
-			for (var i:int = 0; i < allFiles.length; i++)
+			for (var i:int = 0; i<allFiles.length; i++) 
 			{
 				tempFileInfo = allFiles[i];
-				var filename:String = allFiles[i].filename
-				tempFile = targetFile.resolvePath(filename);
+				tempFile = targetFile.resolvePath(allFiles[i].filename);
 				
 				if (tempFile.exists)
 				{
 					tempFile.deleteFile();
 				}
 				
-				tempFileStream = new FileStreamClass();
-				tempFileStream.open(tempFile, FileModeClass.APPEND);
+				tempFileStream = new FileStream();
+				tempFileStream.open(tempFile, FileMode.APPEND);
 				
 				availBytes = tempFileInfo.size;
 				walkerPosition = tempFileInfo.startPosition;
@@ -178,6 +147,7 @@ package de.ketzler.utils
 				while (availBytes > SAVEDBYTES_AT_ONCE)
 				{
 					tempBA.clear();
+					
 					sourceFileStream.position = walkerPosition;
 					sourceFileStream.readBytes(tempBA, 0, SAVEDBYTES_AT_ONCE);
 					tempFileStream.writeBytes(tempBA);
@@ -200,7 +170,7 @@ package de.ketzler.utils
 			allFiles = new Vector.<UntarFileInfo>();
 			allDirectories = new Vector.<UntarFileInfo>();
 			
-			var currentPosition:int = 0;
+			var currentPosition:Number = 0;
 			var hasNewBlock:Boolean = true;
 			var savedLongFileName:String = '';
 			
@@ -216,55 +186,48 @@ package de.ketzler.utils
 				
 				switch (header.type)
 				{
-					case UntarHeaderBlock.TYPE_NULL: 
+					case UntarHeaderBlock.TYPE_NULL:
 						hasNewBlock = false;
 						break;
 					
-					case UntarHeaderBlock.TYPE_LONGFILENAME: 
-						sourceFileStream.position = currentPosition + BLOCK_SIZE;
+					case UntarHeaderBlock.TYPE_LONGFILENAME:
+						sourceFileStream.position = currentPosition+BLOCK_SIZE;
 						savedLongFileName = sourceFileStream.readMultiByte(header.size, CODE_PAGE);
 						break;
 					
 					case UntarHeaderBlock.TYPE_FILE:
-						tempFileInfo.startPosition = currentPosition + BLOCK_SIZE;
+						
+						tempFileInfo.startPosition = currentPosition+BLOCK_SIZE;
 						tempFileInfo.size = header.size;
 						if (savedLongFileName != '')
 						{
 							tempFileInfo.filename = savedLongFileName;
-						}
-						else
-						{
+						} else {
 							tempFileInfo.filename = header.filename;
 						}
 						allFiles.push(tempFileInfo);
 						savedLongFileName = '';
 						break;
 					
-					case UntarHeaderBlock.TYPE_DIR: 
+					case UntarHeaderBlock.TYPE_DIR:
 						if (savedLongFileName != '')
 						{
 							tempFileInfo.filename = savedLongFileName;
-						}
-						else
-						{
+						} else {
 							tempFileInfo.filename = header.filename;
 						}
 						allDirectories.push(tempFileInfo);
 						savedLongFileName = '';
 						break;
-				
 				}
 				
-				currentPosition = currentPosition + (header.size_blocks * BLOCK_SIZE) + BLOCK_SIZE;
+				currentPosition = currentPosition+(header.size_blocks*BLOCK_SIZE)+BLOCK_SIZE;
 				
-				if ((sourceFileStream.bytesAvailable - tempFileInfo.size) < 512)
+				if ((sourceFileStream.bytesAvailable-tempFileInfo.size) < 512)
 				{
 					hasNewBlock = false;
 				}
 			}
-			
 		}
-	
 	}
-	
 }
