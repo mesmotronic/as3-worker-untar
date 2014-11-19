@@ -29,7 +29,7 @@ package com.mesmotronic.workers
 	import flash.system.MessageChannel;
 	import flash.system.Worker;
 	
-	import de.ketzler.utils.SimpleUntar;
+	import com.mesmotronic.utils.SimpleUntar;
 	
 	public class UntarWorker extends Sprite
 	{

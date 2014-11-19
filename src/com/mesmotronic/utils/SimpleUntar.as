@@ -26,10 +26,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
-package de.ketzler.utils 
+package com.mesmotronic.utils 
 {
-	import de.ketzler.utils.untar.UntarFileInfo;
-	import de.ketzler.utils.untar.UntarHeaderBlock;
+	import com.mesmotronic.utils.untar.UntarFileInfo;
+	import com.mesmotronic.utils.untar.UntarHeaderBlock;
 
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;

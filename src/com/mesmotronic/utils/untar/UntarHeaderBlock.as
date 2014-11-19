@@ -1,4 +1,7 @@
 /*
+Copyright (c) 2014, Neil Rackett
+All rights reserved.
+
 Copyright (c) 2012, Christoph Ketzler
 All rights reserved.
 
@@ -23,25 +26,24 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
-package de.ketzler.utils.untar {
-	import de.ketzler.utils.SimpleUntar;
-
+package com.mesmotronic.utils.untar 
+{
+	import com.mesmotronic.utils.SimpleUntar;
 	import flash.utils.ByteArray;
-	public class UntarHeaderBlock extends Object {
-		
+	
+	public class UntarHeaderBlock extends Object 
+	{
 		public var debug:Boolean = true;
-		
 		
 		public static const TYPE_NULL:uint = 0x0;
 		public static const TYPE_FILE:uint = 0x30;
 		public static const TYPE_DIR:uint = 0x35;
 		public static const TYPE_LONGFILENAME:uint = 0x4c; // L,76
 		
-		public var size:uint;
-		public var size_blocks:uint;
+		public var size:Number;
+		public var size_blocks:Number;
 		public var type:uint;
 		public var filename:String;
-		
 		
 		private static const TAR_TYPE_POSITION:uint = 156;
 		private static const TAR_NAME_POSITION:uint = 0;
@@ -49,26 +51,21 @@ package de.ketzler.utils.untar {
 		private static const TAR_SIZE_POSITION:uint = 124;
 		private static const TAR_SIZE_SIZE:uint = 12;
 		
-		private var _ba : ByteArray = new ByteArray();
-		private var tempString : String;
-		
-		public function UntarHeaderBlock() {
-		}
+		private var _ba:ByteArray = new ByteArray();
+		private var tempString:String;
 
-		public function get byteArray() : ByteArray {
+		public function get byteArray():ByteArray 
+		{
 			return _ba;
 		}
-
-		public function set byteArray(ba : ByteArray) : void {
-			
-			
+		public function set byteArray(ba:ByteArray):void 
+		{
 			_ba = ba;
-			
 			parseByteArray();
-			
 		}
 
-		private function parseByteArray() : void {
+		private function parseByteArray():void 
+		{
 			//trace('parse Header');
 			
 			// type
@@ -81,17 +78,21 @@ package de.ketzler.utils.untar {
 			tempString = _ba.readMultiByte(TAR_SIZE_SIZE, SimpleUntar.CODE_PAGE);
 			//trace(tempString);
 			
-			
 			size = parseInt(tempString, 8);
+			
 			if (size != 0)
 			{
 				if (size%SimpleUntar.BLOCK_SIZE == 0)
 				{
 					size_blocks = int(size*SimpleUntar.BLOCK_SIZE_FACTOR);
-				} else {
+				} 
+				else 
+				{
 					size_blocks = int(size*SimpleUntar.BLOCK_SIZE_FACTOR)+1;
 				}
-			} else {
+			}
+			else 
+			{
 				size_blocks = 0;
 			}
 			
@@ -103,14 +104,11 @@ package de.ketzler.utils.untar {
 			
 			//trace(tempString);
 			//trace(tempString.length);
-			
-			
-			return;
 		}
 		
 		public function toString():String
 		{
-			return 'UntarHeader: Type: '+type + ' ('+String.fromCharCode(type)+'), size: '+size+' ('+size_blocks+' Blocks), filename: '+filename;
+			return '[UntarHeaderBlock] type='+type + ' ('+String.fromCharCode(type)+'), size='+size+' ('+size_blocks+' blocks), filename="'+filename+'"';
 		}
 		
 	}
