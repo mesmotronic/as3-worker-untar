@@ -29,6 +29,7 @@
         </excludedEntries>
       </libraryPathEntry>
       <libraryPathEntry kind="3" linkType="2" path="C:/Program Files/Adobe/Adobe Flash Builder 4.7 (64 Bit)/sdks/4.13.0/frameworks/libs/air/airglobal.swc" useDefaultLinkType="false"/>
+      <libraryPathEntry kind="3" linkType="1" path="/as3-untar-worker-lib/bin/as3-untar-worker-lib.swc" useDefaultLinkType="false"/>
     </libraryPath>
     <sourceAttachmentPath/>
   </compiler>
